@@ -19,13 +19,12 @@ var bodyParser = require('body-parser');
 
 var mongoose = require('mongoose');
 var Grumble = require('./models/grumble');
-var config = require('./config');
 
 var moment = require('moment');
 
 var app = express();
 
-mongoose.connect(config.database);
+mongoose.connect(process.env.MONGO_URI || require('./config').database);
 mongoose.connection.on('error', function() {
   console.info('Error: Could not connect to MongoDB. Did you forget to run `mongod`?');
 });
