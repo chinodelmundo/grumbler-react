@@ -1,0 +1,437 @@
+nav {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+    -webkit-align-items: center;
+    align-items: center;
+	background-color: #5d9694;
+    padding: 0 50px 0 50px;
+	border-bottom: 2px solid #ccc;
+	height: 70px;
+}
+
+footer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-top: 1pt solid black;
+    background-color: #eee;
+    padding-left: 20px;
+}
+
+.index-link {
+    font-size: 3rem;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+}
+
+.login-link {
+    font-weight: bold;
+    text-decoration: none;
+    color: white;
+    font-size: 1.6rem;
+}
+
+.login-link:hover, .dropdown-link:hover, .dropdown > a:hover {
+    text-decoration: underline;
+}
+
+.dropdown {
+    display: inline-block;
+}
+
+.dropdown > a {
+    font-size: 1.6rem;
+    color: white;
+    font-weight: bold;
+}
+
+.main-content {
+    display: -webkit-flex;
+    display: flex;
+	position:absolute;
+    top: 80px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+}
+
+.panel-title {
+	text-align: center;
+	font-weight: bold;
+	border-bottom: 1px solid #ccc;
+	padding: 10px 0 10px;
+    margin: 0 20px 0 20px;
+    position: relative;
+}
+
+.user-grumble, .user-info-panel {
+    -webkit-flex: 1;
+    flex: 1;
+    border-right: 1px solid #ccc;
+}
+
+.grumble-stream {
+    -webkit-flex: 2;
+    flex: 2;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    border-right: 1px solid #ccc;
+}
+
+.new-grumble-panel {
+    padding: 0 20px 0 20px;
+}
+
+.grumble-panel {
+    overflow-y: auto;
+    padding: 0 20px 0 20px;
+    margin-top: 10px;
+}
+
+.user-icon {
+	width: 30px;
+	height: 30px;
+}
+
+.grumble {
+	padding-top: 10px;
+    border-bottom: 2px solid #ccc;
+}
+
+.grumble-user, .comment-user {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+	font-weight: bold;
+}
+
+.grumble-content {
+	margin-left: 70px;
+	padding: 10px 10px 10px 10px;
+    white-space: pre-line;
+}
+
+.grumble-footer, .comment-footer {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+	padding: 5px 0 5px 10px;
+}
+
+.grumble-datetime, .comment-datetime {
+	color: gray;
+	font-style: italic;
+	font-size: 8pt;
+}
+
+.grumble-level {
+	font-size: 11pt;
+	font-weight: bold;
+	font-style: italic;
+}
+
+.grumble-level-0 {
+    color: #4285f4;
+}
+
+.grumble-level-1 {
+	color: #d19c00;
+}
+
+.grumble-level-2 {
+	color: #fc6262;
+}
+
+.grumble-level-3 {
+	color: #a30000;
+}
+
+.grumble-level-4 {
+    color: #7ffc5d;
+}
+
+.user-name {
+	padding-left: 10px;
+}
+
+.input-label {
+	padding-top: 10px;
+}
+
+.input-button {
+	margin-top: 10px;
+}
+
+.input-grumble-text, .input-comment-text {
+	width: 100%;
+}
+
+.input-comment-text {
+    margin-top: 5px;
+}
+
+.comments-panel {
+    font-size: 10pt;
+    overflow-y: auto;
+    max-height: 300px;
+    padding-bottom: 5px;
+}
+
+.comment-container {
+    display: -webkit-flex;
+    display: flex;
+}
+
+.space {
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+.comment {
+    -webkit-flex: 2;
+    flex: 2;
+    padding: 5px 0 5px 10px;
+    margin-right: 20px;
+    border-bottom: 1px solid #ccc;
+}
+
+.comment-content {
+	margin-left: 60px;
+    white-space: pre-line;
+}
+
+.grumble-actions {
+    display: -webkit-flex;
+    display: flex;
+	font-size: 10pt;
+}
+
+.action-buttons {
+    -webkit-flex: 2;
+    flex: 2;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #ccc;
+}
+
+.toggle-comments-btn {
+    padding-left: 10px;
+}
+
+.new-comment {
+    display: -webkit-flex;
+    display: flex;
+}
+
+.comment-form {
+    -webkit-flex: 2;
+    flex: 2;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    padding: 5px 20px;
+    font-size: .9em;
+    margin-left: 30px;
+}
+
+.comment-form-top {
+    display: -webkit-flex;
+    display: flex;
+}
+
+.input-comment-username {
+    -webkit-flex: 2;
+    flex: 2;
+}
+
+.submit-comment-btn {
+    margin: 3pt 0 3pt 3pt;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+.chat-panel {
+    -webkit-flex: 1;
+    flex: 1;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    -webkit-justify-content: flex-end;
+    justify-content: flex-end;
+}
+
+#users-count {
+    font-weight: bold;
+    padding: 10px 0 5px 10px;
+    margin: 0 20px 10px 20px;
+    border-bottom: 1px solid #ccc;
+    font-size: 11pt;
+    text-align: right;
+}
+
+.new-message {
+    border-top: 1px solid #ccc;
+    padding: 5px 0 10px;
+    margin: 0 20px 0 20px;
+    font-size: 11pt;
+}
+
+#chat-content {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow-y: auto;
+    font-size: 10pt;
+    padding-left: 20px;
+}
+
+.chat-text {
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+.message-form {
+    padding-left: 10px;
+}
+
+#message-list {
+    list-style-type: none;
+}
+
+.message {
+    display: -webkit-flex;
+    display: flex;
+}
+
+.chat-username {
+    font-weight: bold;
+    padding-right: 5px;
+}
+
+textarea {
+    resize: vertical;
+}
+
+#new-message-text {
+    resize: none;
+}
+
+#update-stream {
+    text-align: center;
+    background-color: #85f6fc;
+    padding: 3px 0 3px;
+    margin: 5px 30px 0 30px;
+    font-style: italic;
+}
+
+#load-more-grumbles {
+    text-align: center;
+    padding: 3px 0 3px;
+    margin: 5px 30px 5px 30px;
+    font-style: italic;
+    text-decoration: underline;
+}
+
+.empathize-btn:visited, .toggle-comments-btn:visited{
+  color: blue;
+}
+
+.empathize-btn:hover, .toggle-comments-btn:hover{
+  color: purple;
+  text-decoration: underline;
+}
+
+.grumble-image {
+    width: 50%; 
+    height: auto;
+    border-radius: 15px 50px 5px 30px;
+}
+
+.image-container {
+    margin-left: 60px;
+    max-height: 150px;
+    overflow: hidden;
+    border-radius: 15px 50px 5px 30px;
+}
+
+.center-content {
+    height: 400px;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+}
+
+.login-panel {
+    width: 50%;
+    height: 50%;
+    padding: 10px 10px 10px 10px;
+    border: 1pt solid #ccc;
+}
+
+.error-message {
+    font-weight: bold;
+    font-size: 2rem;
+    text-align: center;
+    color: red;
+    padding-top: 2rem;
+}
+
+.guest-text {
+    padding-left: 1rem;
+    font-size: 0.9rem;
+    font-style: italic;
+    color: gray;
+    text-decoration: underline;
+}
+
+.user-info {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    -webkit-align-items: center;
+    align-items: center;
+    margin: 10px 10px 0 20px;
+}
+
+.profile-photo-container {
+    width: 50%;
+}
+
+.profile-photo {
+    width: 100%;
+    height: auto;
+}
+
+.table-info {
+    margin-top: 2rem;
+}
+
+.row-name {
+    font-weight: bold;
+    text-align: right
+}
+
+#hide-left-panel-btn {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+}
+
+#show-left-panel-btn {
+    position: absolute;
+    left: 10px;
+    top: 5px;
+    display: none;
+}
