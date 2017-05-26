@@ -37,7 +37,7 @@ class Login extends React.Component {
                     <div className="pure-control-group">
                         <label>Username</label>
                         <input name="username" type="text" placeholder="Username" 
-                          value={this.state.username} onChange={LoginActions.updateUsername} />
+                          value={this.state.username} onChange={LoginActions.updateUsername} autofocus />
                     </div>
 
                     <div className="pure-control-group">
@@ -48,7 +48,7 @@ class Login extends React.Component {
 
                     <div className="pure-controls">
                         <button type="submit" className="pure-button pure-button-primary">Login</button>
-                        <a href="/signup"> Sign Up </a>
+                        <Link to={"/signup"}> Sign Up </Link>
                     </div>
                 </fieldset>
             </form>

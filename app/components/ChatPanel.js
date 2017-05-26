@@ -12,9 +12,10 @@ class ChatPanel extends React.Component {
     componentDidMount() {
         ChatPanelStore.listen(this.onChange);
 
-        let socket = io();
-        
-        socket.on('onlineUsers', (data) => {
+        let socket = io('');
+        let ioChatConnect = io('/chat');
+
+        ioChatConnect.on('onlineUsers', (data) => {
           ChatPanelActions.updateOnlineUsers(data);
         });
 
@@ -40,7 +41,7 @@ class ChatPanel extends React.Component {
         event.preventDefault();
 
         let message = {
-            username: this.state.username.trim(),
+            username: this.props.username ? this.props.username : this.state.username.trim(),
             text: this.state.text.trim()
         };
 
@@ -56,7 +57,7 @@ class ChatPanel extends React.Component {
         var messages = this.state.messages.map((message, index) => {
             return (
                 <div key={index} className="message">
-                    <div className="chat-username">{message.username}</div>
+                    <div className="chat-username">{message.username}:</div>
                     <div className="chat-text">{message.text}</div>
                 </div>
             );
@@ -71,13 +72,17 @@ class ChatPanel extends React.Component {
                 </div>
                 <div className="new-message">
                     <form onSubmit={this.handleSubmit.bind(this)} className="pure-form pure-form-stacked message-form">
-                        <input id="new-message-username" value={this.state.username} onChange={ChatPanelActions.updateUsername} placeholder="Username" required/>
+                        {
+                            !this.props.authenticated &&
+                            <input id="new-message-username" value={this.state.username} onChange={ChatPanelActions.updateUsername} placeholder="Username" required/>
+                        }
+
                         <textarea id="new-message-text" value={this.state.text} onChange={ChatPanelActions.updateText} className="input-grumble-text" rows="2" placeholder="Message" reqired />
                         <button id="sent-message-btn" type="submit" className="pure-button pure-button-primary">Send</button>
                     </form>
                 </div>
             </div>
-        );
+        ); 
     }
 }
 

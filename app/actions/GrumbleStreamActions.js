@@ -23,7 +23,6 @@ class GrumbleStreamActions {
     }
 
     updateGrumbles(count) {
-      console.log('get.. ' + count);
         $.ajax({
             type: 'POST',
             url: '/api/grumbles/more',
@@ -39,14 +38,15 @@ class GrumbleStreamActions {
           });
     }
 
-    addComment(grumbleId, username, text) {
+    addComment(grumbleId, username, text, authenticated) {
         $.ajax({
             type: 'PUT',
             url: '/api/grumble/comment',
             data: { 
                     grumbleId: grumbleId,
                     username: username, 
-                    text: text
+                    text: text,
+                    authenticated: authenticated
                 }
         })
         .done(() => {

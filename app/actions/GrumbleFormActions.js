@@ -10,14 +10,15 @@ class GrumbleFormActions {
         );
     }
 
-    addGrumble(username, text, annoyanceLevel) {
+    addGrumble(username, text, annoyanceLevel, authenticated) {
         $.ajax({
             type: 'POST',
             url: '/api/grumble',
             data: { 
                     username: username, 
                     text: text, 
-                    annoyanceLevel: annoyanceLevel 
+                    annoyanceLevel: annoyanceLevel,
+                    authenticated: authenticated
                 }
         })
         .done((data) => {

@@ -1,4 +1,5 @@
 import React from 'react';
+import {Link} from 'react-router';
 import GrumbleStreamStore from '../stores/GrumbleStreamStore'
 import GrumbleStreamActions from '../actions/GrumbleStreamActions';
 import CommentForm from './CommentForm';
@@ -44,11 +45,12 @@ class GrumbleStream extends React.Component {
     handleCommentFormSubmit(event, index, grumbleId){
         event.preventDefault();
 
-        var username = this.state.commentForms[index].username.trim();
+        var username = this.props.auth ? this.props.auth.username : this.state.commentForms[index].username.trim();
         var text = this.state.commentForms[index].text.trim();
+        var authenticated = this.props.auth ? this.props.auth.authenticated : false;
 
         if (username && text) {
-            GrumbleStreamActions.addComment(grumbleId, username, text);
+            GrumbleStreamActions.addComment(grumbleId, username, text, authenticated);
         }
     }
 
@@ -61,15 +63,31 @@ class GrumbleStream extends React.Component {
         var grumbles = this.state.grumbles.map((grumble, index) => {
             
             var comments = grumble.comments.map((comment, index) => {
-                return (
-                    <div key={index} className="comment-container">
-                        <div className="space"></div>
-                        <div className="comment">
+                let commentUser;
+
+                if(comment.authenticated){
+                    commentUser = (
+                            <div className="comment-user">
+                                <img className="user-icon" src="/img/user-icon.png" />
+                                <div className="user-name">
+                                    <Link to={"/user/" + comment.username}> {comment.username} </Link>
+                                </div>
+                            </div>
+                        );
+                }else{
+                    commentUser = (
                             <div className="comment-user">
                                 <img className="user-icon" src="/img/user-icon.png" />
                                 <div className="user-name"> {comment.username} </div>
                                 <div className="guest-text">Guest User</div>
                             </div>
+                        );
+                }
+                return (
+                    <div key={index} className="comment-container">
+                        <div className="space"></div>
+                        <div className="comment">
+                            {commentUser}
                             <div className="comment-content">{comment.text}</div>
                             <div className="comment-footer">
                                 <div className="comment-datetime" title={comment.date.num}>
@@ -81,13 +99,31 @@ class GrumbleStream extends React.Component {
                 );
             });
 
-            return (
-                <div key={grumble._id} className="grumble">
+            let grumbleUser;
+             if(grumble.authenticated){
+                grumbleUser = (
+                    <div className="grumble-user">
+                        <img className="user-icon" src="/img/user-icon.png" />
+                        <div className="user-name">
+                            <Link to={'/user/' + grumble.username}> {grumble.username} </Link>
+                        </div>      
+                    </div>
+                );
+             }else{
+                grumbleUser = (
                     <div className="grumble-user">
                         <img className="user-icon" src="/img/user-icon.png" />
                         <div className="user-name"> {grumble.username} </div>
-                        <div className="guest-text">Guest User</div>              
+                        <div className="guest-text">Guest User</div>         
                     </div>
+                );
+             }
+                
+            return (
+                <div key={grumble._id} className="grumble">
+                    
+                    {grumbleUser}
+
                     <div className="grumble-content">{grumble.text}</div>
                     <div className="grumble-footer">
                         <div className={"grumble-level grumble-level-" + grumble.annoyanceLevel.num}>
@@ -112,6 +148,7 @@ class GrumbleStream extends React.Component {
                             <div className="new-comment">
                                 <div className="space"></div>
                                 <CommentForm 
+                                    authenticated={this.props.auth ? this.props.auth.authenticated : false}
                                     values={this.state.commentForms[index]} 
                                     onChangeUsername={(event) => this.handleCommentFormUsernameChange(index, event)}  
                                     onChangeText={(event) => this.handleCommentFormTextChange(index, event)} 

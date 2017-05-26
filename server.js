@@ -101,6 +101,7 @@ app.post('/api/grumble', function(req, res, next) {
   var username = req.body.username;
   var text = req.body.text;
   var annoyanceLevel = req.body.annoyanceLevel;
+  var authenticated = req.body.authenticated;
     
   switch (annoyanceLevel) {
       case '1':
@@ -121,6 +122,7 @@ app.post('/api/grumble', function(req, res, next) {
       username: username,
       text: text,
       annoyanceLevel: annoyanceLevel,
+      authenticated: authenticated,
       date: {
         num: Date.now(), 
         text: moment().format('MMMM Do YYYY, h:mm:ss a')
@@ -144,12 +146,14 @@ app.put('/api/grumble/comment', function(req, res, next) {
   var grumbleId = req.body.grumbleId;
   var username = req.body.username;
   var text = req.body.text;
+  var authenticated = req.body.authenticated;
 
   try {
     Grumble.findOne({ _id: grumbleId }, function(err, grumble) {
       grumble.comments.push({
         username: username,
         text: text,
+        authenticated: authenticated,
         date: {
           num: Date.now(), 
           text: moment().format('MMMM Do YYYY, h:mm:ss a')
@@ -178,6 +182,19 @@ app.post('/signup', passport.authenticate('signup', {
   failureFlash : true  
 }));
 
+app.get('/logout', function(req, res) {
+  req.logout();
+  res.redirect('/');
+});
+
+app.get('/checkAuth', function(req, res, next) {
+  if(req.user){
+    res.send(req.user.username);
+  }else{
+    res.send(null);
+  }
+});
+
 app.use(function(req, res) {
   Router.match({ routes: routes.default, location: req.url }, function(err, redirectLocation, renderProps) {
     if (err) {
@@ -203,18 +220,10 @@ var onlineUsers = 0;
 var messages = [];
 
 io.sockets.on('connection', function(socket) {
-  onlineUsers++;
-
-  io.sockets.emit('onlineUsers', { onlineUsers: onlineUsers });
-  io.sockets.emit('startMessages', messages);
-
-  socket.on('disconnect', function() {
-    onlineUsers--;
-    io.sockets.emit('onlineUsers', { onlineUsers: onlineUsers });
-  });
+   io.sockets.emit('startMessages', messages);
 
   socket.on('chatMessage', function(message) {
-    io.sockets.emit('chatMessage', message);
+     io.sockets.emit('chatMessage', message);
 
     if(messages.length >= 5) messages.shift();
     messages.push(message);
@@ -222,6 +231,18 @@ io.sockets.on('connection', function(socket) {
 
   socket.on('newGrumble', function(username) {
     io.sockets.emit('newGrumble', username);
+  });
+});
+
+var ioChat  = io.of('/chat');
+ioChat.on('connection', function(socket){
+  onlineUsers++;
+
+  ioChat.emit('onlineUsers', { onlineUsers: onlineUsers });
+
+  socket.on('disconnect', function() {
+    onlineUsers--;
+    ioChat.emit('onlineUsers', { onlineUsers: onlineUsers });
   });
 });
 

@@ -42,18 +42,40 @@ class Home extends React.Component {
   }
 
   render() {
-    return (
-      <div className="main-content">
-        <GrumbleForm 
-          username={this.state.username} 
-          handleUsernameChange={this.handleChangeUsername}/>
-        <GrumbleStream 
-          username={this.state.username} 
-          newGrumbleCount={this.state.newGrumbleCount} 
-          handleNewGrumbleClick={this.handleNewGrumbleClick}/>
-        <ChatPanel />
-      </div>
-    );
+    let loggedIn = this.props.auth.authenticated;
+
+    if(loggedIn){
+      return (
+        <div className="main-content">
+          <GrumbleForm 
+            authenticated={this.props.auth.authenticated}
+            username={this.props.auth.username} />
+          <GrumbleStream 
+            auth={this.props.auth}
+            username={this.state.username}
+            newGrumbleCount={this.state.newGrumbleCount} 
+            handleNewGrumbleClick={this.handleNewGrumbleClick}/>
+          <ChatPanel 
+            authenticated={true} 
+            username={this.props.auth.username} />
+        </div>
+      );
+    }else{
+      return (
+        <div className="main-content">
+          <GrumbleForm 
+            authenticated = {false}
+            username={this.state.username} 
+            handleUsernameChange={this.handleChangeUsername}/>
+          <GrumbleStream 
+            username={this.state.username} 
+            newGrumbleCount={this.state.newGrumbleCount} 
+            handleNewGrumbleClick={this.handleNewGrumbleClick}/>
+          <ChatPanel 
+            authenticated={false} />
+        </div>
+      );
+    }
   }
 }
 

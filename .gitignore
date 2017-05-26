@@ -4,3 +4,7 @@ node_modules/
 # Logs
 logs
 *.log
+
+public/js/bundle.js
+public/js/bundle.js.map
+public/js/vendor.bundle.js

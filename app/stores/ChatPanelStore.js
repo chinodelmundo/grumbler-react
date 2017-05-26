@@ -9,7 +9,7 @@ class ChatPanelStore {
     this.onlineUsers = 0;
     this.messages = [];
   }
-
+  
   onUpdateUsername(event) {
     this.username = event.target.value.trim();
   }

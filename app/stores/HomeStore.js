@@ -6,6 +6,7 @@ class HomeStore {
     this.bindActions(HomeActions);
     this.username = '';
     this.newGrumbleCount = 0;
+    this.loggedIn = false;
   }
 
   onUpdateUsername(username) {
