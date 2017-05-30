@@ -7,6 +7,7 @@ var grumbleSchema = new mongoose.Schema({
   authenticated: Boolean,
   url: String,
   date: { text: String, num: Number, relative: String },
+  likes: {num: Number, users: [String]},
   comments: [{ username: String, text: String, authenticated: Boolean, date: {text: String, num: Number, relative: String} }]
 });
 

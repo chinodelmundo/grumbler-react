@@ -18,12 +18,12 @@ class GrumbleFormStore {
     this.annoyanceLevel = event.target.value;
   }
 
-  onAddGrumbleSuccess(successMessage) {
+  onAddGrumbleSuccess() {
     this.username = '';
     this.text = '';
     this.annoyanceLevel = 0;
 
-    GrumbleStreamActions.getGrumbles(10);
+    GrumbleStreamActions.getGrumbles();
   }
 
   onAddGrumbleFail(errorMessage) {

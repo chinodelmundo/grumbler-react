@@ -1,24 +1,26 @@
 import React from 'react';
-import {Link} from 'react-router';
-import ReactTooltip from 'react-tooltip'
-import GrumbleStreamStore from '../stores/GrumbleStreamStore'
-import GrumbleStreamActions from '../actions/GrumbleStreamActions';
+import UserPageStore from '../stores/UserPageStore'
+import UserPageActions from '../actions/UserPageActions';
+import ChatPanel from './ChatPanel';
 import CommentForm from './CommentForm';
 
-class GrumbleStream extends React.Component {
+class UserPage extends React.Component {
     constructor(props) {
         super(props);
-        this.state = GrumbleStreamStore.getState();
+        this.state = UserPageStore.getState();
         this.onChange = this.onChange.bind(this);
     }
 
     componentDidMount() {
-        GrumbleStreamStore.listen(this.onChange);
-        GrumbleStreamActions.getGrumbles();
+        UserPageStore.listen(this.onChange);
+        UserPageActions.getUserInfo(this.props.params.username);
+        UserPageActions.getUserGrumbles(this.props.params.username);
+
+        let socket = io();
     }
 
     componentWillUnmount() {
-        GrumbleStreamStore.unlisten(this.onChange);
+        UserPageStore.unlisten(this.onChange);
     }
 
     onChange(state) {
@@ -31,7 +33,7 @@ class GrumbleStream extends React.Component {
             event: event
         };
 
-        GrumbleStreamActions.updateCommentFormUsername(data);
+        UserPageActions.updateCommentFormUsername(data);
     }
 
     handleCommentFormTextChange(index, event) {
@@ -40,13 +42,14 @@ class GrumbleStream extends React.Component {
             text: event.target.value
         };
 
-        GrumbleStreamActions.updateCommentFormText(data);
+        UserPageActions.updateCommentFormText(data);
     }
 
     handleCommentFormSubmit(event, index, grumbleId){
+            console.log('submit?')
         event.preventDefault();
-
-        var username = this.props.auth ? this.props.auth.username : this.state.commentForms[index].username.trim();
+        console.log(this.props.auth)
+        var username = this.props.auth.authenticated ? this.props.auth.username : this.state.commentForms[index].username.trim();
         var text = this.state.commentForms[index].text.trim();
         var authenticated = this.props.auth ? this.props.auth.authenticated : false;
 
@@ -56,26 +59,14 @@ class GrumbleStream extends React.Component {
                 text: ''
             };
 
-            GrumbleStreamActions.updateCommentFormText(data);
-            GrumbleStreamActions.addComment(grumbleId, username, text, authenticated);
+            UserPageActions.updateCommentFormText(data);
+            UserPageActions.addComment(grumbleId, username, text, authenticated);
         }
     }
 
     handleHideCommentsClick(event, index){
         event.preventDefault();
-        GrumbleStreamActions.hideComments(index);
-    }
-
-    handleEmpathize(index, grumbleId){
-        if(this.props.auth && this.props.auth.authenticated){
-            GrumbleStreamActions.toggleEmpathize(index, this.props.auth.username, grumbleId);
-        }else{
-            toastr.options = {
-              "closeButton": true,
-              "positionClass": "toast-top-center"
-            }
-            toastr.warning('Must be logged-in to empathize.');
-        }
+        UserPageActions.hideComments(index);
     }
 
     render() {
@@ -137,30 +128,6 @@ class GrumbleStream extends React.Component {
                     </div>
                 );
              }
-
-             let tooltip = '';
-             if(grumble.likes.num > 0){
-                const userList = grumble.likes.users.map(function(user, index){
-                    return (
-                        <li key={index}>{user}</li>
-                    );
-                })
-                let userString = grumble.likes.num == 1 ? ' user ' : ' users ';
-                tooltip = (
-                            <ReactTooltip id={grumble._id} place="bottom">
-                                {grumble.likes.num + userString + 'empathizes with this grumble.'}
-                                <ul>
-                                    {userList}
-                                </ul>
-                            </ReactTooltip>
-                        );
-             }else{
-                tooltip = (
-                            <ReactTooltip id={grumble._id} place="bottom">
-                                Be the first to empathize!
-                            </ReactTooltip>
-                        );
-             }
                 
             return (
                 <div key={grumble._id} className="grumble">
@@ -179,14 +146,10 @@ class GrumbleStream extends React.Component {
                     <div className="grumble-actions">
                         <div className="space"></div>
                         <div className="action-buttons">
-                            <a href="#" className="empathize-btn" onClick={() => this.handleEmpathize(index, grumble._id)} data-tip data-for={grumble._id}> 
-                                Empathize {grumble.likes.num > 0 && '(' + grumble.likes.num + ')'} 
-                            </a>
-                            <a href="#" className="toggle-comments-btn" onClick={(event) => this.handleHideCommentsClick(event, index)} > 
-                                {this.state.hideComments[index] ? 'Show ' : 'Hide'} comments {comments.length > 0 && '(' + comments.length + ')'} 
+                            <a href="#" className="empathize-btn"> Empathize </a>
+                            <a href="#" className="toggle-comments-btn" onClick={(event) => this.handleHideCommentsClick(event, index)} > {this.state.hideComments[index] ? 'Show ' : 'Hide'} comments 
                             </a>
                         </div>
-                        {tooltip}
                     </div>
                     { 
                         !this.state.hideComments[index] &&
@@ -209,29 +172,51 @@ class GrumbleStream extends React.Component {
         });
 
         return (
-            <div className="grumble-stream">
-                <div className="panel-title">
-                    Grumble Stream
-                    <button className="panel-icon-right" title="Refressh Grumble Stream"
-                        onClick={() => GrumbleStreamActions.updateGrumbles(this.state.grumbles.length)} >
-                        <i className="fa fa-refresh" aria-hidden="true"></i>
-                    </button>
-                </div>
-                {   
-                    this.props.newGrumbleCount > 0 &&
-                    <div id="update-stream">
-                        <a href="#" onClick={() => {this.props.handleNewGrumbleClick(); GrumbleStreamActions.getGrumbles();}}>{this.props.newGrumbleCount} New Grumbles. Click to Show.</a>
+            <div className="main-content">
+                <div className="user-info-panel">
+                    <div className="panel-title"> User Info </div>
+                    <div  className="user-info">
+                        <div className="profile-photo-container">
+                            <img className="profile-photo" src="/img/user-icon.png" />
+                        </div>
+                        <table className="pure-table pure-table-horizontal table-info">
+                            <tbody>
+                                <tr>
+                                    <td className="row-name">Username:</td>
+                                    <td>{this.state.pageOwner.username}</td>
+                                </tr>
+
+                                <tr>
+                                    <td className="row-name">Sign Up Date:</td>
+                                    <td>{this.state.pageOwner.signUpDate}</td>
+                                </tr>
+
+                                <tr>
+                                    <td className="row-name">Grumbles:</td>
+                                    <td>{this.state.grumbles.length}</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                }
-                <div className="grumble-panel">
-                    {grumbles}
-                    <div id="load-more-grumbles">
-                        <a href="#" onClick={() => GrumbleStreamActions.updateGrumbles(this.state.grumbles.length + 10)}>Load more Grumbles</a>
+                </div>
+                <div className="grumble-stream">
+                    <div className="panel-title">
+                        {this.state.pageOwner.username}'s Grumble Stream
+                        <button className="panel-icon-right" title="Refressh Grumble Stream"
+                            onClick={() => UserPageActions.getUserGrumbles(this.props.params.username)} >
+                            <i className="fa fa-refresh" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <div className="grumble-panel">
+                        {grumbles}
                     </div>
                 </div>
+                <ChatPanel 
+                    authenticated={this.props.auth.authenticated} 
+                    username={this.props.auth.username} />
             </div>
         );
     }
 }
 
-export default GrumbleStream;
+export default UserPage;

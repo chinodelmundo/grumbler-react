@@ -199,7 +199,6 @@ footer {
     -webkit-flex: 2;
     flex: 2;
     padding: 5px 0 5px 10px;
-    margin-right: 20px;
     border-bottom: 1px solid #ccc;
 }
 
@@ -223,6 +222,7 @@ footer {
 
 .toggle-comments-btn {
     padding-left: 10px;
+    text-decoration: underline;
 }
 
 .new-comment {
@@ -340,6 +340,10 @@ textarea {
     text-decoration: underline;
 }
 
+.empathize-btn {
+    text-decoration: underline;
+}
+
 .empathize-btn:visited, .toggle-comments-btn:visited{
   color: blue;
 }
@@ -423,15 +427,14 @@ textarea {
     text-align: right
 }
 
-#hide-left-panel-btn {
+.panel-icon-right {
     position: absolute;
     right: 10px;
     top: 5px;
+    background-color: white;
+    border: 1pt solid #ccc;
 }
 
-#show-left-panel-btn {
-    position: absolute;
-    left: 10px;
-    top: 5px;
-    display: none;
+.form-username {
+    font-weight: bold;
 }

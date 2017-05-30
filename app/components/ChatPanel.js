@@ -1,4 +1,5 @@
 import React from 'react';
+import {Link} from 'react-router';
 import ChatPanelStore from '../stores/ChatPanelStore'
 import ChatPanelActions from '../actions/ChatPanelActions';
 
@@ -65,7 +66,12 @@ class ChatPanel extends React.Component {
 
         return (
             <div className="chat-panel">
-                <div className="panel-title">Chat</div>
+                <div className="panel-title">
+                    Chat
+                    <button className="panel-icon-right" title="Open Chat tab">
+                        <a href={'/chat'} className="fa fa-comment-o" aria-hidden="true"></a>
+                    </button>
+                </div>
                 <div id="users-count"> {this.state.onlineUsers} users are here</div>
                 <div id="chat-content">
                     {messages}

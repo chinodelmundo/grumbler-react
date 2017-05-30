@@ -38,17 +38,19 @@ class GrumbleForm extends React.Component {
     }
 
     render() {
-        const userfasfsname = this.props.authenticated ? 
-            (
-                <label className="input-label">{this.props.username}</label>
-            )
-            :
-            (
-                <div>
-                    <label className="input-label">Username</label>
-                    <input value={this.props.username} onChange={this.props.handleUsernameChange} required />
-                </div>
-            );
+        let formUsername;
+        if(this.props.authenticated){
+            formUsername = (
+                    <label className="input-label">{this.props.username}</label>
+                );
+        }else{
+            formUsername = (
+                    <div>
+                        <label className="input-label">Username</label>
+                        <input value={this.props.username} onChange={this.props.handleUsernameChange} required />
+                    </div>
+                );
+        }
 
         return (
             <div className="user-grumble">
@@ -58,7 +60,7 @@ class GrumbleForm extends React.Component {
                 <div className="new-grumble-panel">
                     <form className="pure-form pure-form-stacked" onSubmit={this.handleSubmit.bind(this)}>
                 
-                        {userfasfsname}
+                        {formUsername}
 
                         <label className="input-label">Grumble Text</label>
                         <textarea value={this.state.text} onChange={GrumbleFormActions.updateText}

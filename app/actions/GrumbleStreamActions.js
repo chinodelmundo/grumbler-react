@@ -13,13 +13,12 @@ class GrumbleStreamActions {
     }
 
     getGrumbles() {
-        $.ajax({ url: '/api/grumbles' })
-          .done(data => {
-            this.actions.getGrumblesSuccess(data);
-          })
-          .fail(data => {
-            console.log('fail');
-          });
+      $.ajax({ url: '/api/grumbles' })
+      .done(data => {
+        this.actions.getGrumblesSuccess(data);
+      })
+      .fail(data => {
+      });
     }
 
     updateGrumbles(count) {
@@ -34,7 +33,6 @@ class GrumbleStreamActions {
             this.actions.getGrumblesSuccess(data);
           })
           .fail(data => {
-            console.log('fail');
           });
     }
 
@@ -50,11 +48,26 @@ class GrumbleStreamActions {
                 }
         })
         .done(() => {
-            console.log('success');
             this.actions.getGrumbles();
         })
         .fail(() => {
         });
+    }
+
+    toggleEmpathize(index, username, grumbleId){
+      $.ajax({
+          type: 'PUT',
+          url: '/api/grumble/empathize',
+          data: { 
+                  grumbleId: grumbleId,
+                  username: username
+              }
+      })
+      .done(() => {
+          this.actions.getGrumbles();
+      })
+      .fail(() => {
+      });
     }
 }
 

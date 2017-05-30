@@ -22,7 +22,7 @@ class GrumbleFormActions {
                 }
         })
         .done((data) => {
-            this.actions.addGrumbleSuccess(data.message);
+            this.actions.addGrumbleSuccess();
         })
         .fail((data) => {
             this.actions.addGrumbleFail(data.message);

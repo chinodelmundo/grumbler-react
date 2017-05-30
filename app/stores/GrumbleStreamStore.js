@@ -22,16 +22,12 @@ class GrumbleStreamStore {
     }
   }
 
-  onGetGrumblesFail(grumbles) {
-    this.grumbles = grumbles;
-  }
-
   onUpdateCommentFormUsername(data) {
     this.commentForms[data.index].username = data.event.target.value.trim();
   }
 
   onUpdateCommentFormText(data) {
-    this.commentForms[data.index].text = data.event.target.value;
+    this.commentForms[data.index].text = data.text;
   }
 
   onHideComments(index){

@@ -19,6 +19,7 @@ var bodyParser = require('body-parser');
 
 var mongoose = require('mongoose');
 var Grumble = require('./models/grumble');
+var User = require('./models/user');
 
 var moment = require('moment');
 
@@ -29,7 +30,7 @@ mongoose.connection.on('error', function() {
   console.info('Error: Could not connect to MongoDB. Did you forget to run `mongod`?');
 });
 
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 3001);
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -123,6 +124,10 @@ app.post('/api/grumble', function(req, res, next) {
       text: text,
       annoyanceLevel: annoyanceLevel,
       authenticated: authenticated,
+      likes: {
+        num: 0,
+        users: []
+      },
       date: {
         num: Date.now(), 
         text: moment().format('MMMM Do YYYY, h:mm:ss a')
@@ -162,12 +167,70 @@ app.put('/api/grumble/comment', function(req, res, next) {
 
       grumble.save(function(err) {
         if (err) return next(err);
-        res.send({ message: 'grumble has been added successfully!' });
+        res.send({ message: 'comment has been added successfully!' });
       });
     });
   } catch (e) {
-    res.status(404).send({ message: 'Error in submitting grumble.' });
+    res.status(404).send({ message: 'Error in submitting comment.' });
   }
+});
+
+/**
+ * PUT /api/grumble/empathize
+ * Update grumble likes.
+ */
+app.put('/api/grumble/empathize', function(req, res, next) {
+  var grumbleId = req.body.grumbleId;
+  var username = req.body.username;
+
+  try {
+    Grumble.findOne({ _id: grumbleId }, function(err, grumble) {
+      grumble.likes.num++;
+      grumble.likes.users.push(username);
+
+      grumble.save(function(err) {
+        if (err) return next(err);
+        res.send({ message: 'empathize has been added' });
+      });
+    });
+  } catch (e) {
+    res.status(404).send({ message: 'Error in adding empathize.' });
+  }
+});
+
+/**
+ * GET /api/grumbles/:username
+ * Returns user's grumbler
+ */
+app.get('/api/grumbles/:username', function(req, res, next) {
+  var username = req.params.username;
+
+  Grumble
+    .find({'username': username, 'authenticated': true})
+    .sort('-date.num')
+    .limit(50)
+    .exec(function(err, grumbles) {
+      if (err) return next(err);
+
+      grumbles = formatResult(grumbles);
+      res.send(grumbles);
+    });
+});
+
+/**
+ * GET /api/user/:username
+ * Returns user's information
+ */
+app.get('/api/user/:username', function(req, res, next) {
+  var username = req.params.username;
+
+  User
+    .find({'username': username})
+    .limit(1)
+    .exec(function(err, user) {
+      if (err) return next(err);
+      res.send(user);
+    });
 });
 
 app.post('/login', passport.authenticate('login', {
@@ -220,12 +283,14 @@ var onlineUsers = 0;
 var messages = [];
 
 io.sockets.on('connection', function(socket) {
-   io.sockets.emit('startMessages', messages);
+  io.sockets.emit('startMessages', messages);
 
   socket.on('chatMessage', function(message) {
-     io.sockets.emit('chatMessage', message);
+    io.sockets.emit('chatMessage', message);
 
-    if(messages.length >= 5) messages.shift();
+    if(messages.length >= 10) 
+      messages.shift();
+
     messages.push(message);
   });
 

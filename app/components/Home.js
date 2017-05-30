@@ -1,5 +1,4 @@
 import React from 'react';
-import {Link} from 'react-router';
 import HomeStore from '../stores/HomeStore'
 import HomeActions from '../actions/HomeActions';
 import GrumbleForm from './GrumbleForm';
@@ -18,8 +17,9 @@ class Home extends React.Component {
     HomeStore.listen(this.onChange);
 
     let socket = io();
-    socket.on('newGrumble', (username) => {
-        if(username !== this.state.username){
+    socket.on('newGrumble', (newGrubmleUsername) => {
+        let username = this.props.auth.authenticated? this.props.auth.username : this.state.username;
+        if(newGrubmleUsername !== username){
           HomeActions.updateNewGrumbleCount(++this.state.newGrumbleCount);
         }
     });
@@ -52,7 +52,6 @@ class Home extends React.Component {
             username={this.props.auth.username} />
           <GrumbleStream 
             auth={this.props.auth}
-            username={this.state.username}
             newGrumbleCount={this.state.newGrumbleCount} 
             handleNewGrumbleClick={this.handleNewGrumbleClick}/>
           <ChatPanel 
@@ -68,7 +67,6 @@ class Home extends React.Component {
             username={this.state.username} 
             handleUsernameChange={this.handleChangeUsername}/>
           <GrumbleStream 
-            username={this.state.username} 
             newGrumbleCount={this.state.newGrumbleCount} 
             handleNewGrumbleClick={this.handleNewGrumbleClick}/>
           <ChatPanel 
