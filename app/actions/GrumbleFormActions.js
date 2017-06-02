@@ -6,7 +6,7 @@ class GrumbleFormActions {
             'updateText',
             'updateAnnoyanceLevel',
             'addGrumbleSuccess',
-            'addGrumbleFail'
+            'clearGrumbleForm'
         );
     }
 
@@ -21,11 +21,12 @@ class GrumbleFormActions {
                     authenticated: authenticated
                 }
         })
-        .done((data) => {
+        .done(() => {
             this.actions.addGrumbleSuccess();
         })
-        .fail((data) => {
-            this.actions.addGrumbleFail(data.message);
+        .fail(() => {
+            alertify.set('notifier','position', 'bottom-left');
+            alertify.error('Error on Grumble submission.');
         });
     }
 }

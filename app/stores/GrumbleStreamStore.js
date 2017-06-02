@@ -7,6 +7,8 @@ class GrumbleStreamStore {
     this.grumbles = [];
     this.commentForms = [];
     this.hideComments = [];
+    this.empathized = [];
+    this.pageOwner = '';
   }
 
   onGetGrumblesSuccess(grumbles) {
@@ -18,6 +20,7 @@ class GrumbleStreamStore {
         username: '',
         text: ''
       });
+
       this.hideComments.push(false);
     }
   }
@@ -32,6 +35,15 @@ class GrumbleStreamStore {
 
   onHideComments(index){
     this.hideComments[index] = !this.hideComments[index];
+    console.log(this);
+  }
+
+  onSetPageOwner(username){
+    this.pageOwner = username;
+  }
+
+  onActionSuccess(){
+    GrumbleStreamActions.updateGrumbles(this.grumbles.length, this.pageOwner);
   }
 }
 

@@ -221,7 +221,7 @@ footer {
 }
 
 .toggle-comments-btn {
-    padding-left: 10px;
+    padding-left: 20px;
     text-decoration: underline;
 }
 
@@ -344,11 +344,16 @@ textarea {
     text-decoration: underline;
 }
 
-.empathize-btn:visited, .toggle-comments-btn:visited{
+.empathize-num-btn {
+    margin-left: 2px;
+    text-decoration: underline;
+}
+
+.empathize-btn:visited, .empathize-num-btn:visited, .toggle-comments-btn:visited{
   color: blue;
 }
 
-.empathize-btn:hover, .toggle-comments-btn:hover{
+.empathize-btn:hover, .empathize-num-btn:hover, .toggle-comments-btn:hover{
   color: purple;
   text-decoration: underline;
 }

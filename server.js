@@ -81,17 +81,31 @@ app.get('/api/grumbles', function(req, res, next) {
  */
 app.post('/api/grumbles/more', function(req, res, next) {
   var count = parseInt(req.body.count);
+  var username = req.body.username;
 
-  Grumble
-    .find()
-    .sort('-date.num')
-    .limit(count)
-    .exec(function(err, grumbles) {
-      if (err) return next(err);
+  if(username){
+    Grumble
+      .find({'username': username, 'authenticated': true})
+      .sort('-date.num')
+      .limit(count)
+      .exec(function(err, grumbles) {
+        if (err) return next(err);
 
-      grumbles = formatResult(grumbles);
-      res.send(grumbles);
-    });
+        grumbles = formatResult(grumbles);
+        res.send(grumbles);
+      });
+  }else{
+    Grumble
+      .find()
+      .sort('-date.num')
+      .limit(count)
+      .exec(function(err, grumbles) {
+        if (err) return next(err);
+
+        grumbles = formatResult(grumbles);
+        res.send(grumbles);
+      });
+  }
 });
 
 /**
@@ -136,10 +150,10 @@ app.post('/api/grumble', function(req, res, next) {
 
     grumble.save(function(err) {
       if (err) return next(err);
-      res.send({ message: 'grumble has been added successfully!' });
+      res.send();
     });
   } catch (e) {
-    res.status(404).send({ message: 'Error in submitting grumble.' });
+    res.status(404).send();
   }
 });
 
@@ -167,11 +181,11 @@ app.put('/api/grumble/comment', function(req, res, next) {
 
       grumble.save(function(err) {
         if (err) return next(err);
-        res.send({ message: 'comment has been added successfully!' });
+        res.send();
       });
     });
   } catch (e) {
-    res.status(404).send({ message: 'Error in submitting comment.' });
+    res.status(404).send();
   }
 });
 
@@ -182,19 +196,28 @@ app.put('/api/grumble/comment', function(req, res, next) {
 app.put('/api/grumble/empathize', function(req, res, next) {
   var grumbleId = req.body.grumbleId;
   var username = req.body.username;
+  var empathized = req.body.empathized;
+
+  
 
   try {
     Grumble.findOne({ _id: grumbleId }, function(err, grumble) {
-      grumble.likes.num++;
-      grumble.likes.users.push(username);
+      if(empathized == 'true'){
+        var index = grumble.likes.users.indexOf(username);
+        grumble.likes.users.splice(index, 1);
+        grumble.likes.num--;
+      }else{
+        grumble.likes.num++;
+        grumble.likes.users.push(username);
+      }
 
       grumble.save(function(err) {
         if (err) return next(err);
-        res.send({ message: 'empathize has been added' });
+        res.send();
       });
     });
   } catch (e) {
-    res.status(404).send({ message: 'Error in adding empathize.' });
+    res.status(404).send();
   }
 });
 
@@ -208,7 +231,7 @@ app.get('/api/grumbles/:username', function(req, res, next) {
   Grumble
     .find({'username': username, 'authenticated': true})
     .sort('-date.num')
-    .limit(50)
+    .limit(10)
     .exec(function(err, grumbles) {
       if (err) return next(err);
 

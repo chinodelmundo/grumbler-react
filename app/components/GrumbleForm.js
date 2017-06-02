@@ -31,26 +31,17 @@ class GrumbleForm extends React.Component {
 
         if (username && text) {
             GrumbleFormActions.addGrumble(username, text, annoyanceLevel, authenticated);
+            GrumbleFormActions.clearGrumbleForm();
 
             let socket = io.connect();
             socket.emit('newGrumble', this.props.username);
+
+            alertify.set('notifier','position', 'bottom-left');
+            alertify.message('Grumble submitted! Please wait.');
         }
     }
 
     render() {
-        let formUsername;
-        if(this.props.authenticated){
-            formUsername = (
-                    <label className="input-label">{this.props.username}</label>
-                );
-        }else{
-            formUsername = (
-                    <div>
-                        <label className="input-label">Username</label>
-                        <input value={this.props.username} onChange={this.props.handleUsernameChange} required />
-                    </div>
-                );
-        }
 
         return (
             <div className="user-grumble">
@@ -60,7 +51,13 @@ class GrumbleForm extends React.Component {
                 <div className="new-grumble-panel">
                     <form className="pure-form pure-form-stacked" onSubmit={this.handleSubmit.bind(this)}>
                 
-                        {formUsername}
+                        {
+                            !this.props.authenticated && 
+                            <div>
+                                <label className="input-label">Username</label>
+                                <input value={this.props.username} onChange={this.props.handleUsernameChange} required />
+                            </div>
+                        }
 
                         <label className="input-label">Grumble Text</label>
                         <textarea value={this.state.text} onChange={GrumbleFormActions.updateText}

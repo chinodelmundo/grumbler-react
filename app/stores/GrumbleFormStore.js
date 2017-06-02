@@ -7,7 +7,6 @@ class GrumbleFormStore {
     this.bindActions(GrumbleFormActions);
     this.text = '';
     this.annoyanceLevel = 0;
-    this.helpBlock = '';
   }
 
   onUpdateText(event) {
@@ -26,8 +25,9 @@ class GrumbleFormStore {
     GrumbleStreamActions.getGrumbles();
   }
 
-  onAddGrumbleFail(errorMessage) {
-    this.helpBlock = errorMessage;
+  onClearGrumbleForm() {
+    this.text = '';
+    this.annoyanceLevel = 0;
   }
 }
 

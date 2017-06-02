@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import {Link} from 'react-router';
 import ChatPanelStore from '../stores/ChatPanelStore'
 import ChatPanelActions from '../actions/ChatPanelActions';
@@ -34,6 +35,10 @@ class ChatPanel extends React.Component {
         ChatPanelStore.unlisten(this.onChange);
     }
 
+    componentDidUpdate(){
+        this.scrollToBottom();
+    }
+
     onChange(state) {
         this.setState(state);
     }
@@ -53,6 +58,12 @@ class ChatPanel extends React.Component {
 
         ChatPanelActions.clearText();
     }
+
+    scrollToBottom(){
+        var chat = document.getElementById("chat-content");
+        chat.scrollTop = chat.scrollHeight;
+    }
+
 
     render() {
         var messages = this.state.messages.map((message, index) => {

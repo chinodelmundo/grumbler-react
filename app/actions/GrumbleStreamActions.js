@@ -8,32 +8,44 @@ class GrumbleStreamActions {
           'updateCommentFormUsername',
           'updateCommentFormText',
           'incrementNewGrumbleCount',
-          'hideComments'
+          'hideComments',
+          'actionSuccess',
+          'setPageOwner'
         );
     }
 
-    getGrumbles() {
-      $.ajax({ url: '/api/grumbles' })
-      .done(data => {
-        this.actions.getGrumblesSuccess(data);
-      })
-      .fail(data => {
-      });
+    getGrumbles(username) {
+      if(username){
+        $.ajax({ url: '/api/grumbles/' + username })
+        .done(data => {
+          this.actions.getGrumblesSuccess(data);
+        })
+        .fail(data => {
+        });
+      }else{
+        $.ajax({ url: '/api/grumbles' })
+        .done(data => {
+          this.actions.getGrumblesSuccess(data);
+        })
+        .fail(data => {
+        });
+      }
     }
 
-    updateGrumbles(count) {
-        $.ajax({
-            type: 'POST',
-            url: '/api/grumbles/more',
-            data: { 
-                    count: count
+    updateGrumbles(count, username) {
+      $.ajax({
+          type: 'POST',
+          url: '/api/grumbles/more',
+          data: { 
+                  count: count,
+                  username: username
                 }
+      })
+        .done(data => {
+          this.actions.getGrumblesSuccess(data);
         })
-          .done(data => {
-            this.actions.getGrumblesSuccess(data);
-          })
-          .fail(data => {
-          });
+        .fail(data => {
+        });
     }
 
     addComment(grumbleId, username, text, authenticated) {
@@ -45,28 +57,33 @@ class GrumbleStreamActions {
                     username: username, 
                     text: text,
                     authenticated: authenticated
-                }
+                  }
         })
         .done(() => {
-            this.actions.getGrumbles();
+          this.actions.actionSuccess();
         })
         .fail(() => {
+            alertify.set('notifier','position', 'bottom-left');
+            alertify.error('Error on Comment submission.');
         });
     }
 
-    toggleEmpathize(index, username, grumbleId){
+    toggleEmpathize(index, username, grumbleId, empathized){
       $.ajax({
           type: 'PUT',
           url: '/api/grumble/empathize',
           data: { 
                   grumbleId: grumbleId,
-                  username: username
-              }
+                  username: username,
+                  empathized: empathized
+                }
       })
       .done(() => {
-          this.actions.getGrumbles();
+        this.actions.actionSuccess();
       })
       .fail(() => {
+          alertify.set('notifier','position', 'bottom-left');
+          alertify.error('Error on Empathize.');
       });
     }
 }

@@ -43,7 +43,7 @@ class Home extends React.Component {
 
   render() {
     let loggedIn = this.props.auth.authenticated;
-
+    
     if(loggedIn){
       return (
         <div className="main-content">

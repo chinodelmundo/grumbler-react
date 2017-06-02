@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import {Link} from 'react-router';
 import ReactTooltip from 'react-tooltip'
 import GrumbleStreamStore from '../stores/GrumbleStreamStore'
@@ -14,7 +15,9 @@ class GrumbleStream extends React.Component {
 
     componentDidMount() {
         GrumbleStreamStore.listen(this.onChange);
-        GrumbleStreamActions.getGrumbles();
+        GrumbleStreamActions.getGrumbles(this.props.pageOwner);
+        GrumbleStreamActions.setPageOwner(this.props.pageOwner);
+        this.comment = [];
     }
 
     componentWillUnmount() {
@@ -46,7 +49,7 @@ class GrumbleStream extends React.Component {
     handleCommentFormSubmit(event, index, grumbleId){
         event.preventDefault();
 
-        var username = this.props.auth ? this.props.auth.username : this.state.commentForms[index].username.trim();
+        var username = this.props.auth && this.props.auth.authenticated ? this.props.auth.username : this.state.commentForms[index].username.trim();
         var text = this.state.commentForms[index].text.trim();
         var authenticated = this.props.auth ? this.props.auth.authenticated : false;
 
@@ -58,24 +61,37 @@ class GrumbleStream extends React.Component {
 
             GrumbleStreamActions.updateCommentFormText(data);
             GrumbleStreamActions.addComment(grumbleId, username, text, authenticated);
+
+            alertify.set('notifier','position', 'bottom-left');
+            alertify.message('Comment submitted! Please wait.');
         }
     }
 
     handleHideCommentsClick(event, index){
         event.preventDefault();
         GrumbleStreamActions.hideComments(index);
+        const node = ReactDOM.findDOMNode(this.comment[index]);
+        $(node).toggle(200);
     }
 
-    handleEmpathize(index, grumbleId){
+    toggleEmpathize(index, grumbleId, empathized){
         if(this.props.auth && this.props.auth.authenticated){
-            GrumbleStreamActions.toggleEmpathize(index, this.props.auth.username, grumbleId);
+            GrumbleStreamActions.toggleEmpathize(index, this.props.auth.username, grumbleId, empathized);
         }else{
-            toastr.options = {
-              "closeButton": true,
-              "positionClass": "toast-top-center"
-            }
-            toastr.warning('Must be logged-in to empathize.');
+            alertify.set('notifier','position', 'bottom-left');
+            alertify.error('Must be logged-in to empathize.');
         }
+    }
+
+    showEmpathizers(users){
+        let title = users.length + ((users.length == 1) ? ' user': ' users') + ' empathized with this grumble.';
+
+        let userLinks = '';
+        users.map((user)=>{
+            userLinks = userLinks.concat("<p><a href='/user/" + user + "'>" + user + "</a><p>")
+        });
+
+        alertify.alert(title, userLinks);
     }
 
     render() {
@@ -138,20 +154,28 @@ class GrumbleStream extends React.Component {
                 );
              }
 
-             let tooltip = '';
+             let tooltip;
              if(grumble.likes.num > 0){
-                const userList = grumble.likes.users.map(function(user, index){
-                    return (
-                        <li key={index}>{user}</li>
-                    );
-                })
-                let userString = grumble.likes.num == 1 ? ' user ' : ' users ';
+                let usersList = '';
+
+                switch(grumble.likes.num) {
+                    case 1:
+                        usersList = grumble.likes.users.toString();
+                        break;
+                    case 2:
+                    case 3:
+                        usersList = grumble.likes.users.slice(0, grumble.likes.users.length - 1).toString();
+                        usersList = usersList.concat(' and ' + grumble.likes.users[grumble.likes.users.length - 1]);
+                        break;
+                    default:
+                        usersList = grumble.likes.users.slice(0,3).join(', ');
+                        usersList = usersList.concat(' and ' + (grumble.likes.num - 3));
+                        usersList = grumble.likes.num - 3 == 1 ? usersList + ' other': usersList + ' others';
+                }
+
                 tooltip = (
                             <ReactTooltip id={grumble._id} place="bottom">
-                                {grumble.likes.num + userString + 'empathizes with this grumble.'}
-                                <ul>
-                                    {userList}
-                                </ul>
+                                {usersList + ' empathized with this grumble.'}
                             </ReactTooltip>
                         );
              }else{
@@ -160,6 +184,14 @@ class GrumbleStream extends React.Component {
                                 Be the first to empathize!
                             </ReactTooltip>
                         );
+             }
+
+             let empathized = false;
+             if(this.props.auth && this.props.auth.authenticated){
+                 grumble.likes.users.forEach((user) => {
+                    if(user === this.props.auth.username)
+                        empathized = true;
+                 });
              }
                 
             return (
@@ -179,41 +211,44 @@ class GrumbleStream extends React.Component {
                     <div className="grumble-actions">
                         <div className="space"></div>
                         <div className="action-buttons">
-                            <a href="#" className="empathize-btn" onClick={() => this.handleEmpathize(index, grumble._id)} data-tip data-for={grumble._id}> 
-                                Empathize {grumble.likes.num > 0 && '(' + grumble.likes.num + ')'} 
+                            <a role="button" className="empathize-btn" onClick={() => this.toggleEmpathize(index, grumble._id, empathized)} data-tip data-for={grumble._id}> 
+                                { empathized ? 'Unempathize' : 'Empathize' }
                             </a>
-                            <a href="#" className="toggle-comments-btn" onClick={(event) => this.handleHideCommentsClick(event, index)} > 
+                            {
+                                grumble.likes.num > 0 && 
+                                <a role="button" className="empathize-num-btn" onClick={() => this.showEmpathizers(grumble.likes.users)}>({grumble.likes.num})</a>
+                            }
+                            <a role="button" className="toggle-comments-btn" onClick={(event) => this.handleHideCommentsClick(event, index)} > 
                                 {this.state.hideComments[index] ? 'Show ' : 'Hide'} comments {comments.length > 0 && '(' + comments.length + ')'} 
                             </a>
                         </div>
                         {tooltip}
                     </div>
-                    { 
-                        !this.state.hideComments[index] &&
-                        <div className="comments-panel">
-                            {comments}
-                            <div className="new-comment">
-                                <div className="space"></div>
-                                <CommentForm 
-                                    authenticated={this.props.auth ? this.props.auth.authenticated : false}
-                                    values={this.state.commentForms[index]} 
-                                    onChangeUsername={(event) => this.handleCommentFormUsernameChange(index, event)}  
-                                    onChangeText={(event) => this.handleCommentFormTextChange(index, event)} 
-                                    handleSubmit={(event) => this.handleCommentFormSubmit(event, index, grumble._id)} 
-                                />
-                            </div>
+                    <div className="comments-panel" ref={(el) => { this.comment[index] = el; }}>
+                        {comments}
+                        <div className="new-comment">
+                            <div className="space"></div>
+                            <CommentForm 
+                                authenticated={this.props.auth ? this.props.auth.authenticated : false}
+                                values={this.state.commentForms[index]} 
+                                onChangeUsername={(event) => this.handleCommentFormUsernameChange(index, event)}  
+                                onChangeText={(event) => this.handleCommentFormTextChange(index, event)} 
+                                handleSubmit={(event) => this.handleCommentFormSubmit(event, index, grumble._id)} 
+                            />
                         </div>
-                    }
+                    </div>
                 </div>
             );
         });
 
+        console.log(this.state);
         return (
             <div className="grumble-stream">
                 <div className="panel-title">
+                    {this.props.pageOwner? this.props.pageOwner + "'s ": "" }
                     Grumble Stream
-                    <button className="panel-icon-right" title="Refressh Grumble Stream"
-                        onClick={() => GrumbleStreamActions.updateGrumbles(this.state.grumbles.length)} >
+                    <button className="panel-icon-right" title="Refresh Grumble Stream"
+                        onClick={() => GrumbleStreamActions.updateGrumbles(this.state.grumbles.length, this.state.pageOwner)} >
                         <i className="fa fa-refresh" aria-hidden="true"></i>
                     </button>
                 </div>
@@ -226,7 +261,7 @@ class GrumbleStream extends React.Component {
                 <div className="grumble-panel">
                     {grumbles}
                     <div id="load-more-grumbles">
-                        <a href="#" onClick={() => GrumbleStreamActions.updateGrumbles(this.state.grumbles.length + 10)}>Load more Grumbles</a>
+                        <a href="#" onClick={() => GrumbleStreamActions.updateGrumbles(this.state.grumbles.length + 10, this.state.pageOwner)}>Load more Grumbles</a>
                     </div>
                 </div>
             </div>
