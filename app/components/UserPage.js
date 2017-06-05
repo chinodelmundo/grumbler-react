@@ -27,8 +27,21 @@ class UserPage extends React.Component {
         this.setState(state);
     }
 
-    render() {
+    handleDescSubmit(event){
+        event.preventDefault();
 
+        var username = this.props.auth.username;
+        var description = this.state.description;
+
+        if (username && description) {
+            UserPageActions.updateUserDescription(username, description);
+
+            alertify.set('notifier','position', 'bottom-left');
+            alertify.message('Updating description. Please wait.');
+        }
+    }
+
+    render() {
         return (
             <div className="main-content">
                 <div className="user-info-panel">
@@ -43,21 +56,47 @@ class UserPage extends React.Component {
                                     <td className="row-name">Username:</td>
                                     <td>{this.state.pageOwner.username}</td>
                                 </tr>
-
                                 <tr>
                                     <td className="row-name">Sign Up Date:</td>
                                     <td>{this.state.pageOwner.signUpDate}</td>
                                 </tr>
                             </tbody>
                         </table>
+                        <div className="user-description">
+                            <div className="user-desc-header">
+                                Description 
+                                
+                                {
+                                    (this.props.auth.username == this.props.params.username) &&
+                                    <i className="fa fa-pencil-square-o action-icon" role="button" title="Edit Description" aria-hidden="true" 
+                                        onClick={UserPageActions.showDescTextarea}></i>
+                                }
+                            </div>
+                            <div className="user-desc-body">
+                                {
+                                    this.state.showDescTextArea &&
+                                    <div>
+                                        <form className="pure-form" onSubmit={this.handleDescSubmit.bind(this)}>
+                                            <textarea value={this.state.description} onChange={UserPageActions.updateDescription} className="input-desc-text" rows="4" placeholder="Description" required />
+                                            <button type="submit" className="pure-button pure-button-primary save-desc-btn">Save</button>
+                                        </form>
+                                    </div>
+                                }
+                                {
+                                    !this.state.showDescTextArea &&
+                                    <div>
+                                        {this.state.pageOwner.description ? this.state.pageOwner.description : 'No description has been given.'}
+                                    </div>
+                                }
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <GrumbleStream 
                     auth={this.props.auth} 
                     pageOwner={this.props.params.username}/>
                 <ChatPanel 
-                    authenticated={this.props.auth.authenticated} 
-                    username={this.props.auth.username} />
+                    auth={this.props.auth} />
             </div>
         );
     }

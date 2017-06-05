@@ -27,7 +27,7 @@ class Login extends React.Component {
     return (
       <div>
         <div className="error-message">
-          {this.state.message}
+          {this.props.location.query.status == 'fail' && 'Login failed.'}
         </div>
         <div className="center-content">
           <div className="login-panel">
@@ -37,17 +37,20 @@ class Login extends React.Component {
                     <div className="pure-control-group">
                         <label>Username</label>
                         <input name="username" type="text" placeholder="Username" 
-                          value={this.state.username} onChange={LoginActions.updateUsername} autofocus />
+                          value={this.state.username} onChange={LoginActions.updateUsername} required autofocus />
                     </div>
 
                     <div className="pure-control-group">
                         <label>Password</label>
                         <input name="password" type="password" placeholder="Password" 
-                          value={this.state.password} onChange={LoginActions.updatePassword} />
+                          value={this.state.password} onChange={LoginActions.updatePassword}  required />
                     </div>
 
-                    <div className="pure-controls">
+                    <div className="pure-controls flex-container-auth">
                         <button type="submit" className="pure-button pure-button-primary">Login</button>
+                        <div className="auth-text">
+                          Don't have an account? 
+                        </div>
                         <Link to={"/signup"}> Sign Up </Link>
                     </div>
                 </fieldset>

@@ -49,9 +49,9 @@ class GrumbleStream extends React.Component {
     handleCommentFormSubmit(event, index, grumbleId){
         event.preventDefault();
 
-        var username = this.props.auth && this.props.auth.authenticated ? this.props.auth.username : this.state.commentForms[index].username.trim();
+        var username = this.props.auth.authenticated ? this.props.auth.username : this.state.commentForms[index].username.trim();
         var text = this.state.commentForms[index].text.trim();
-        var authenticated = this.props.auth ? this.props.auth.authenticated : false;
+        var authenticated = this.props.auth.authenticated;
 
         if (username && text) {
             let data = {
@@ -74,8 +74,8 @@ class GrumbleStream extends React.Component {
         $(node).toggle(200);
     }
 
-    toggleEmpathize(index, grumbleId, empathized){
-        if(this.props.auth && this.props.auth.authenticated){
+    handleEmpathizeClick(index, grumbleId, empathized){
+        if(this.props.auth.authenticated){
             GrumbleStreamActions.toggleEmpathize(index, this.props.auth.username, grumbleId, empathized);
         }else{
             alertify.set('notifier','position', 'bottom-left');
@@ -83,7 +83,7 @@ class GrumbleStream extends React.Component {
         }
     }
 
-    showEmpathizers(users){
+    handleShowEmpathizers(users){
         let title = users.length + ((users.length == 1) ? ' user': ' users') + ' empathized with this grumble.';
 
         let userLinks = '';
@@ -187,11 +187,8 @@ class GrumbleStream extends React.Component {
              }
 
              let empathized = false;
-             if(this.props.auth && this.props.auth.authenticated){
-                 grumble.likes.users.forEach((user) => {
-                    if(user === this.props.auth.username)
-                        empathized = true;
-                 });
+             if(this.props.auth.authenticated && grumble.likes.users.includes(this.props.auth.username)){
+                empathized = true;
              }
                 
             return (
@@ -211,12 +208,12 @@ class GrumbleStream extends React.Component {
                     <div className="grumble-actions">
                         <div className="space"></div>
                         <div className="action-buttons">
-                            <a role="button" className="empathize-btn" onClick={() => this.toggleEmpathize(index, grumble._id, empathized)} data-tip data-for={grumble._id}> 
+                            <a role="button" className="empathize-btn" onClick={() => this.handleEmpathizeClick(index, grumble._id, empathized)} data-tip data-for={grumble._id}> 
                                 { empathized ? 'Unempathize' : 'Empathize' }
                             </a>
                             {
                                 grumble.likes.num > 0 && 
-                                <a role="button" className="empathize-num-btn" onClick={() => this.showEmpathizers(grumble.likes.users)}>({grumble.likes.num})</a>
+                                <a role="button" className="empathize-num-btn" onClick={() => this.handleShowEmpathizers(grumble.likes.users)} data-tip data-for={grumble._id}>({grumble.likes.num})</a>
                             }
                             <a role="button" className="toggle-comments-btn" onClick={(event) => this.handleHideCommentsClick(event, index)} > 
                                 {this.state.hideComments[index] ? 'Show ' : 'Hide'} comments {comments.length > 0 && '(' + comments.length + ')'} 
@@ -229,7 +226,7 @@ class GrumbleStream extends React.Component {
                         <div className="new-comment">
                             <div className="space"></div>
                             <CommentForm 
-                                authenticated={this.props.auth ? this.props.auth.authenticated : false}
+                                authenticated={this.props.auth.authenticated}
                                 values={this.state.commentForms[index]} 
                                 onChangeUsername={(event) => this.handleCommentFormUsernameChange(index, event)}  
                                 onChangeText={(event) => this.handleCommentFormTextChange(index, event)} 
@@ -241,7 +238,6 @@ class GrumbleStream extends React.Component {
             );
         });
 
-        console.log(this.state);
         return (
             <div className="grumble-stream">
                 <div className="panel-title">
@@ -260,9 +256,12 @@ class GrumbleStream extends React.Component {
                 }
                 <div className="grumble-panel">
                     {grumbles}
-                    <div id="load-more-grumbles">
-                        <a href="#" onClick={() => GrumbleStreamActions.updateGrumbles(this.state.grumbles.length + 10, this.state.pageOwner)}>Load more Grumbles</a>
-                    </div>
+                    {
+                        !this.props.pageOwner&&
+                        <div id="load-more-grumbles">
+                            <a href="#" onClick={() => GrumbleStreamActions.updateGrumbles(this.state.grumbles.length + 10, this.state.pageOwner)}>Load more Grumbles</a>
+                        </div>
+                    }
                 </div>
             </div>
         );

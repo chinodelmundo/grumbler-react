@@ -27,7 +27,7 @@ class ChatPage extends React.Component {
         return (
 	        <div className="main-content">
 	            <ChatPanel 
-	                authenticated={false} />
+	                auth={this.props.auth} />
 	        </div>
 	    );
     }

@@ -231,7 +231,6 @@ app.get('/api/grumbles/:username', function(req, res, next) {
   Grumble
     .find({'username': username, 'authenticated': true})
     .sort('-date.num')
-    .limit(10)
     .exec(function(err, grumbles) {
       if (err) return next(err);
 
@@ -256,9 +255,32 @@ app.get('/api/user/:username', function(req, res, next) {
     });
 });
 
+/**
+ * PUT /api/user/description
+ * Updates user's description.
+ */
+app.put('/api/user/description', function(req, res, next) {
+  var username = req.body.username;
+  var description = req.body.description;
+
+  try {
+    User.findOne({ 'username': username }, function(err, user) {
+      console.log('found user');
+      user.description = description;
+
+      user.save(function(err) {
+        if (err) return next(err);
+        res.send();
+      });
+    });
+  } catch (e) {
+    res.status(404).send();
+  }
+});
+
 app.post('/login', passport.authenticate('login', {
   successRedirect: '/',
-  failureRedirect: '/login',
+  failureRedirect: '/login?status=fail',
   failureFlash : true  
 }));
 

@@ -47,7 +47,7 @@ class ChatPanel extends React.Component {
         event.preventDefault();
 
         let message = {
-            username: this.props.username ? this.props.username : this.state.username.trim(),
+            username: this.props.auth.authenticated ? this.props.auth.username : this.state.username.trim(),
             text: this.state.text.trim()
         };
 
@@ -57,6 +57,10 @@ class ChatPanel extends React.Component {
         }
 
         ChatPanelActions.clearText();
+    }
+
+    handleRedirectToChat(){
+        window.location = '/chat';
     }
 
     scrollToBottom(){
@@ -79,8 +83,8 @@ class ChatPanel extends React.Component {
             <div className="chat-panel">
                 <div className="panel-title">
                     Chat
-                    <button className="panel-icon-right" title="Open Chat tab">
-                        <a href={'/chat'} className="fa fa-comment-o" aria-hidden="true"></a>
+                    <button className="panel-icon-right" title="Open Chat tab" onClick={this.handleRedirectToChat}>
+                        <i className="fa fa-comment-o" aria-hidden="true"></i>
                     </button>
                 </div>
                 <div id="users-count"> {this.state.onlineUsers} users are here</div>
@@ -90,7 +94,7 @@ class ChatPanel extends React.Component {
                 <div className="new-message">
                     <form onSubmit={this.handleSubmit.bind(this)} className="pure-form pure-form-stacked message-form">
                         {
-                            !this.props.authenticated &&
+                            !this.props.auth.authenticated &&
                             <input id="new-message-username" value={this.state.username} onChange={ChatPanelActions.updateUsername} placeholder="Username" required/>
                         }
 

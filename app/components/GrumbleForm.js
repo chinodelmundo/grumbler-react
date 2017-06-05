@@ -24,17 +24,17 @@ class GrumbleForm extends React.Component {
     handleSubmit(event) {
         event.preventDefault();
 
-        var username = this.props.username.trim();
+        var username = this.props.auth.authenticated ? this.props.auth.username : this.props.username;
         var text = this.state.text.trim();
         var annoyanceLevel = this.state.annoyanceLevel;
-        var authenticated = this.props.authenticated;
+        var authenticated = this.props.auth.authenticated;
 
         if (username && text) {
             GrumbleFormActions.addGrumble(username, text, annoyanceLevel, authenticated);
             GrumbleFormActions.clearGrumbleForm();
 
             let socket = io.connect();
-            socket.emit('newGrumble', this.props.username);
+            socket.emit('newGrumble', username);
 
             alertify.set('notifier','position', 'bottom-left');
             alertify.message('Grumble submitted! Please wait.');
@@ -52,7 +52,7 @@ class GrumbleForm extends React.Component {
                     <form className="pure-form pure-form-stacked" onSubmit={this.handleSubmit.bind(this)}>
                 
                         {
-                            !this.props.authenticated && 
+                            !this.props.auth.authenticated && 
                             <div>
                                 <label className="input-label">Username</label>
                                 <input value={this.props.username} onChange={this.props.handleUsernameChange} required />

@@ -37,17 +37,20 @@ class Login extends React.Component {
                     <div className="pure-control-group">
                         <label>Username</label>
                         <input name="username" type="text" placeholder="Username" 
-                          value={this.state.username} onChange={SignupActions.updateUsername} autofocus />
+                          value={this.state.username} onChange={SignupActions.updateUsername} required autofocus />
                     </div>
 
                     <div className="pure-control-group">
                         <label>Password</label>
                         <input name="password" type="password" placeholder="Password" 
-                          value={this.state.password} onChange={SignupActions.updatePassword} />
+                          value={this.state.password} onChange={SignupActions.updatePassword} required />
                     </div>
 
-                    <div className="pure-controls">
+                    <div className="pure-controls flex-container-auth">
                         <button type="submit" className="pure-button pure-button-primary">Sign up</button>
+                        <div className="auth-text">
+                          Already have an account? 
+                        </div>
                         <Link to={"/login"}> Login </Link>
                     </div>
                 </fieldset>
