@@ -30,7 +30,7 @@ class Login extends React.Component {
           {this.props.location.query.status == 'fail' && 'Login failed.'}
         </div>
         <div className="center-content">
-          <div className="login-panel">
+          <div className="auth-panel">
             <form className="pure-form pure-form-aligned" method="POST">
                 <fieldset>
                   <legend> Login Form</legend>

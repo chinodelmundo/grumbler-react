@@ -9,16 +9,7 @@ nav {
     padding: 0 50px 0 50px;
 	border-bottom: 2px solid #ccc;
 	height: 70px;
-}
-
-footer {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-top: 1pt solid black;
-    background-color: #eee;
-    padding-left: 20px;
+    width: 100%;
 }
 
 .index-link {
@@ -273,8 +264,6 @@ footer {
     display: flex;
     -webkit-flex-direction: column;
     flex-direction: column;
-    -webkit-justify-content: flex-end;
-    justify-content: flex-end;
 }
 
 #users-count {
@@ -389,10 +378,8 @@ textarea {
     justify-content: center;
 }
 
-.login-panel {
-    width: 40%;
-    height: 50%;
-    padding: 10px 10px 10px 10px;
+.auth-panel {
+    padding: 10px 20px 10px 20px;
     border: 1pt solid #ccc;
 }
 

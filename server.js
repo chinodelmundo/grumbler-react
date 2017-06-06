@@ -203,12 +203,14 @@ app.put('/api/grumble/empathize', function(req, res, next) {
   try {
     Grumble.findOne({ _id: grumbleId }, function(err, grumble) {
       if(empathized == 'true'){
-        var index = grumble.likes.users.indexOf(username);
-        grumble.likes.users.splice(index, 1);
-        grumble.likes.num--;
+        if(grumble.likes.includes(username)){
+          var index = grumble.likes.indexOf(username);
+          grumble.likes.splice(index, 1);
+        }
       }else{
-        grumble.likes.num++;
-        grumble.likes.users.push(username);
+        if(!grumble.likes.includes(username)){
+          grumble.likes.push(username);
+        }
       }
 
       grumble.save(function(err) {

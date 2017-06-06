@@ -155,22 +155,22 @@ class GrumbleStream extends React.Component {
              }
 
              let tooltip;
-             if(grumble.likes.num > 0){
+             if(grumble.likes.length > 0){
                 let usersList = '';
 
-                switch(grumble.likes.num) {
+                switch(grumble.likes.length) {
                     case 1:
-                        usersList = grumble.likes.users.toString();
+                        usersList = grumble.likes.toString();
                         break;
                     case 2:
                     case 3:
-                        usersList = grumble.likes.users.slice(0, grumble.likes.users.length - 1).toString();
-                        usersList = usersList.concat(' and ' + grumble.likes.users[grumble.likes.users.length - 1]);
+                        usersList = grumble.likes.slice(0, grumble.likes.length - 1).join(', ');
+                        usersList = usersList.concat(' and ' + grumble.likes[grumble.likes.length - 1]);
                         break;
                     default:
-                        usersList = grumble.likes.users.slice(0,3).join(', ');
-                        usersList = usersList.concat(' and ' + (grumble.likes.num - 3));
-                        usersList = grumble.likes.num - 3 == 1 ? usersList + ' other': usersList + ' others';
+                        usersList = grumble.likes.slice(0,3).join(', ');
+                        usersList = usersList.concat(' and ' + (grumble.likes.length - 3));
+                        usersList = grumble.likes.length - 3 == 1 ? usersList + ' other': usersList + ' others';
                 }
 
                 tooltip = (
@@ -187,7 +187,7 @@ class GrumbleStream extends React.Component {
              }
 
              let empathized = false;
-             if(this.props.auth.authenticated && grumble.likes.users.includes(this.props.auth.username)){
+             if(this.props.auth.authenticated && grumble.likes.includes(this.props.auth.username)){
                 empathized = true;
              }
                 
@@ -212,8 +212,8 @@ class GrumbleStream extends React.Component {
                                 { empathized ? 'Unempathize' : 'Empathize' }
                             </a>
                             {
-                                grumble.likes.num > 0 && 
-                                <a role="button" className="empathize-num-btn" onClick={() => this.handleShowEmpathizers(grumble.likes.users)} data-tip data-for={grumble._id}>({grumble.likes.num})</a>
+                                grumble.likes.length > 0 && 
+                                <a role="button" className="empathize-num-btn" onClick={() => this.handleShowEmpathizers(grumble.likes)} data-tip data-for={grumble._id}>({grumble.likes.length})</a>
                             }
                             <a role="button" className="toggle-comments-btn" onClick={(event) => this.handleHideCommentsClick(event, index)} > 
                                 {this.state.hideComments[index] ? 'Show ' : 'Hide'} comments {comments.length > 0 && '(' + comments.length + ')'} 

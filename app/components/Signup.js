@@ -30,7 +30,7 @@ class Login extends React.Component {
           {this.state.message}
         </div>
         <div className="center-content">
-          <div className="login-panel">
+          <div className="auth-panel">
             <form className="pure-form pure-form-aligned" method="POST">
                 <fieldset>
                   <legend> Sign Up Form</legend>
