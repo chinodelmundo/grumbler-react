@@ -4,6 +4,7 @@ import UserPageActions from '../actions/UserPageActions';
 import GrumbleStream from './GrumbleStream';
 import ChatPanel from './ChatPanel';
 import CommentForm from './CommentForm';
+import Dropzone from 'react-dropzone'
 
 class UserPage extends React.Component {
     constructor(props) {
@@ -33,11 +34,22 @@ class UserPage extends React.Component {
         var username = this.props.auth.username;
         var description = this.state.description;
 
-        if (username && description) {
+        if(username && description){
             UserPageActions.updateUserDescription(username, description);
 
             alertify.set('notifier','position', 'bottom-left');
             alertify.message('Updating description. Please wait.');
+        }
+    }
+
+    handleFileDrop(file){
+        var username = this.props.auth.username;
+
+        if(file && username){
+            UserPageActions.updateProfilePicture(username, file);
+
+            alertify.set('notifier','position', 'bottom-left');
+            alertify.message('Updating profile picture. Please wait.');
         }
     }
 
@@ -48,7 +60,26 @@ class UserPage extends React.Component {
                     <div className="panel-title"> User Info </div>
                     <div  className="user-info">
                         <div className="profile-photo-container">
-                            <img className="profile-photo" src="/img/user-icon.png" />
+                            {
+                                this.state.pageOwner.imgLink &&
+                                <img className="profile-photo" src={this.state.pageOwner.imgLink} />
+                            }
+                            {
+                                !this.state.pageOwner.imgLink &&
+                                <img className="profile-photo" src="/img/user-icon.png" />
+                            }
+                        </div>
+                        <div>
+                            {
+                                (this.props.auth.username == this.props.params.username) &&
+                                <Dropzone 
+                                    className="dropzone"
+                                    onDrop={this.handleFileDrop.bind(this)}
+                                    accept="image/jpeg, image/png"
+                                >
+                                    <p>Click to change profile picture.</p>
+                                </Dropzone>
+                            }
                         </div>
                         <table className="pure-table pure-table-horizontal table-info">
                             <tbody>

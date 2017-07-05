@@ -17,6 +17,7 @@ class UserPageStore {
   	this.pageOwner.username = data.username;
     this.pageOwner.signUpDate = data.signUpDate;
     this.pageOwner.description = data.description;
+    this.pageOwner.imgLink = data.imgLink;
     this.description = data.description;
   }
 

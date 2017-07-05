@@ -1,4 +1,5 @@
 import alt from '../alt';
+import imgur from 'imgur';
 
 class UserPageActions {
     constructor() {
@@ -34,6 +35,27 @@ class UserPageActions {
         .fail(() => {
             alertify.set('notifier','position', 'bottom-left');
             alertify.error('Error on updating description.');
+        });
+    }
+
+    updateProfilePicture(username, file) {
+        let data = new FormData();
+        data.append('file', file[0]);
+        data.append('username', username);
+
+        $.ajax({
+            type: 'POST',
+            url: '/api/user/picture',
+            data: data,
+            processData: false,
+            contentType: false
+        })
+        .done(() => {
+            this.actions.actionSuccess();
+        })
+        .fail(() => {
+            alertify.set('notifier','position', 'bottom-left');
+            alertify.error('Error on updating profice picture.');
         });
     }
 }

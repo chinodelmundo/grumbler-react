@@ -2,6 +2,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 var async = require('async');
 var request = require('request');
 var xml2js = require('xml2js');
+var fs = require('fs');
 
 // Babel ES6/JSX Compiler
 require('babel-register');
@@ -16,12 +17,17 @@ var express = require('express');
 var path = require('path');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
+var fileUpload = require('express-fileupload');
 
 var mongoose = require('mongoose');
 var Grumble = require('./models/grumble');
 var User = require('./models/user');
 
 var moment = require('moment');
+var uuidV4 = require('uuid/v4');
+var imgur = require('imgur');
+
+const filePath = './public/img/';
 
 var app = express();
 
@@ -32,6 +38,7 @@ mongoose.connection.on('error', function() {
 
 app.set('port', process.env.PORT || 3001);
 app.use(logger('dev'));
+app.use(fileUpload({ safeFileNames: true }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -198,8 +205,6 @@ app.put('/api/grumble/empathize', function(req, res, next) {
   var username = req.body.username;
   var empathized = req.body.empathized;
 
-  
-
   try {
     Grumble.findOne({ _id: grumbleId }, function(err, grumble) {
       if(empathized == 'true'){
@@ -267,7 +272,6 @@ app.put('/api/user/description', function(req, res, next) {
 
   try {
     User.findOne({ 'username': username }, function(err, user) {
-      console.log('found user');
       user.description = description;
 
       user.save(function(err) {
@@ -278,6 +282,42 @@ app.put('/api/user/description', function(req, res, next) {
   } catch (e) {
     res.status(404).send();
   }
+});
+
+/**
+ * POST /api/user/picture
+ * Updates user's profile picture.
+ */
+app.post('/api/user/picture', function(req, res, next) {
+  let uploadFile = req.files.file;
+  let filename = uuidV4() + '.jpg';
+  let username = req.body.username;
+
+  uploadFile.mv(filePath + filename , function(err) {
+    if (err) return next(err);
+
+    imgur.setClientId(process.env.IMGUR_CLIENT_ID || require('./config').IMGUR_CLIENT_ID);
+    imgur.uploadFile(filePath + filename)
+      .then(function (json) {
+        try {
+          User.findOne({ 'username': username }, function(err, user) {
+            user.imgLink = json.data.link;
+
+            user.save(function(err) {
+              if (err) return next(err);
+              res.send();
+            });
+          });
+        } catch (e) {
+          res.status(404).send();
+        }
+      })
+      .catch(function (err) {
+          console.error(err.message);
+      });
+  });
+
+  
 });
 
 app.post('/login', passport.authenticate('login', {
