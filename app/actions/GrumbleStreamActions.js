@@ -48,15 +48,16 @@ class GrumbleStreamActions {
         });
     }
 
-    addComment(grumbleId, username, text, authenticated) {
+    addComment(grumbleId, newComment) {
         $.ajax({
             type: 'PUT',
             url: '/api/grumble/comment',
             data: { 
                     grumbleId: grumbleId,
-                    username: username, 
-                    text: text,
-                    authenticated: authenticated
+                    username: newComment.username, 
+                    text: newComment.text,
+                    authenticated: newComment.authenticated,
+                    imgLink: newComment.imgLink
                   }
         })
         .done(() => {

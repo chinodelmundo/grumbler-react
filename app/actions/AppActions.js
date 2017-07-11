@@ -9,9 +9,9 @@ class AppActions {
 
   	getUser() {
 	    $.ajax({ url: '/checkAuth' })
-      	.done(username => {
-          if(username)
-        	 this.actions.getUserSuccess(username);
+      	.done(user => {
+          if(user)
+        	 this.actions.getUserSuccess(user);
       	})
       	.fail(() => {
       	});

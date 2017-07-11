@@ -6,11 +6,13 @@ class AppStore {
     	this.bindActions(AppActions);
     	this.username = '';
     	this.authenticated = false;
+    	this.imgLink = '';
   	}
 
-  	onGetUserSuccess(username) {
-    	this.username = username;
+  	onGetUserSuccess(user) {
+    	this.username = user.username;
     	this.authenticated = true;
+    	this.imgLink = user.imgLink;
   	}
 }
 

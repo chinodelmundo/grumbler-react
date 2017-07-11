@@ -1,8 +1,6 @@
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 var async = require('async');
 var request = require('request');
 var xml2js = require('xml2js');
-var fs = require('fs');
 
 // Babel ES6/JSX Compiler
 require('babel-register');
@@ -124,6 +122,7 @@ app.post('/api/grumble', function(req, res, next) {
   var text = req.body.text;
   var annoyanceLevel = req.body.annoyanceLevel;
   var authenticated = req.body.authenticated;
+  var imgLink = req.body.imgLink;
     
   switch (annoyanceLevel) {
       case '1':
@@ -143,12 +142,10 @@ app.post('/api/grumble', function(req, res, next) {
     var grumble = new Grumble({
       username: username,
       text: text,
+      imgLink: imgLink,
       annoyanceLevel: annoyanceLevel,
       authenticated: authenticated,
-      likes: {
-        num: 0,
-        users: []
-      },
+      likes: [],
       date: {
         num: Date.now(), 
         text: moment().format('MMMM Do YYYY, h:mm:ss a')
@@ -173,6 +170,7 @@ app.put('/api/grumble/comment', function(req, res, next) {
   var username = req.body.username;
   var text = req.body.text;
   var authenticated = req.body.authenticated;
+  var imgLink = req.body.imgLink;
 
   try {
     Grumble.findOne({ _id: grumbleId }, function(err, grumble) {
@@ -180,6 +178,7 @@ app.put('/api/grumble/comment', function(req, res, next) {
         username: username,
         text: text,
         authenticated: authenticated,
+        imgLink: imgLink,
         date: {
           num: Date.now(), 
           text: moment().format('MMMM Do YYYY, h:mm:ss a')
@@ -300,12 +299,35 @@ app.post('/api/user/picture', function(req, res, next) {
     imgur.uploadFile(filePath + filename)
       .then(function (json) {
         try {
-          User.findOne({ 'username': username }, function(err, user) {
+          User.findOne({'username': username}, function(err, user) {
             user.imgLink = json.data.link;
 
             user.save(function(err) {
               if (err) return next(err);
-              res.send();
+
+              Grumble
+                .find({$or:[{'username': username, 'authenticated': true}, {'comments.username': username, 'comments.authenticated': true}]})
+                .exec(function(err, grumbles) {
+                  if (err) return next(err);
+
+                  grumbles.forEach((grumble) => {
+                    if(grumble.username == username){
+                      grumble.imgLink = json.data.link;
+                    }
+                    
+                    grumble.comments.forEach((comment) => {
+                      if(comment.username == username){
+                        comment.imgLink = json.data.link;
+                      }
+                    });
+
+                    grumble.save(function(err) {
+                      if (err) return next(err);
+                    });
+                  });
+
+                  res.send();
+                });
             });
           });
         } catch (e) {
@@ -339,7 +361,7 @@ app.get('/logout', function(req, res) {
 
 app.get('/checkAuth', function(req, res, next) {
   if(req.user){
-    res.send(req.user.username);
+    res.send(req.user);
   }else{
     res.send(null);
   }

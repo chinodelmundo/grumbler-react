@@ -24,13 +24,18 @@ class GrumbleForm extends React.Component {
     handleSubmit(event) {
         event.preventDefault();
 
-        var username = this.props.auth.authenticated ? this.props.auth.username : this.props.username;
-        var text = this.state.text.trim();
-        var annoyanceLevel = this.state.annoyanceLevel;
-        var authenticated = this.props.auth.authenticated;
+        var newGrumble = {
+            username: this.props.auth.authenticated ? this.props.auth.username : this.props.username,
+            text: this.state.text.trim(),
+            annoyanceLevel: this.state.annoyanceLevel,
+            authenticated: this.props.auth.authenticated,
+            imgLink: this.props.auth.imgLink ? this.props.auth.imgLink : ''
+        };
 
-        if (username && text) {
-            GrumbleFormActions.addGrumble(username, text, annoyanceLevel, authenticated);
+        
+
+        if (newGrumble.username && newGrumble.text) {
+            GrumbleFormActions.addGrumble(newGrumble);
             GrumbleFormActions.clearGrumbleForm();
 
             let socket = io.connect();
@@ -42,7 +47,6 @@ class GrumbleForm extends React.Component {
     }
 
     render() {
-
         return (
             <div className="user-grumble">
                 <div className="panel-title">

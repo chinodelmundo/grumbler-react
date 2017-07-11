@@ -27,7 +27,8 @@ class App extends React.Component {
   render() {
   	const auth = {
   		authenticated: this.state.authenticated,
-  		username: this.state.username
+  		username: this.state.username,
+      imgLink: this.state.imgLink,
   	}
 
   	const children = React.Children.map(this.props.children,

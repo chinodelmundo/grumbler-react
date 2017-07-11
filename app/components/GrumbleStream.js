@@ -49,18 +49,21 @@ class GrumbleStream extends React.Component {
     handleCommentFormSubmit(event, index, grumbleId){
         event.preventDefault();
 
-        var username = this.props.auth.authenticated ? this.props.auth.username : this.state.commentForms[index].username.trim();
-        var text = this.state.commentForms[index].text.trim();
-        var authenticated = this.props.auth.authenticated;
+        var newComment = {
+            username: this.props.auth.authenticated ? this.props.auth.username : this.state.commentForms[index].username.trim(),
+            text: this.state.commentForms[index].text.trim(),
+            authenticated: this.props.auth.authenticated,
+            imgLink: this.props.auth.imgLink ? this.props.auth.imgLink : ''
+        };
 
-        if (username && text) {
+        if (newComment.username && newComment.text) {
             let data = {
                 index: index,
                 text: ''
             };
 
             GrumbleStreamActions.updateCommentFormText(data);
-            GrumbleStreamActions.addComment(grumbleId, username, text, authenticated);
+            GrumbleStreamActions.addComment(grumbleId, newComment);
 
             alertify.set('notifier','position', 'bottom-left');
             alertify.message('Comment submitted! Please wait.');
@@ -103,7 +106,14 @@ class GrumbleStream extends React.Component {
                 if(comment.authenticated){
                     commentUser = (
                             <div className="comment-user">
-                                <img className="user-icon" src="/img/user-icon.png" />
+                                {
+                                    !comment.imgLink &&
+                                    <img className="user-icon" src="/img/user-icon.png" />
+                                }
+                                {
+                                    comment.imgLink &&
+                                    <img className="user-icon" src={comment.imgLink} />
+                                }
                                 <div className="user-name">
                                     <a href={"/user/" + comment.username}> {comment.username} </a>
                                 </div>
@@ -138,7 +148,14 @@ class GrumbleStream extends React.Component {
              if(grumble.authenticated){
                 grumbleUser = (
                     <div className="grumble-user">
-                        <img className="user-icon" src="/img/user-icon.png" />
+                        {
+                            !grumble.imgLink &&
+                            <img className="user-icon" src="/img/user-icon.png" />
+                        }
+                        {
+                            grumble.imgLink &&
+                            <img className="user-icon" src={grumble.imgLink} />
+                        }
                         <div className="user-name">
                             <a href={'/user/' + grumble.username}> {grumble.username} </a>
                         </div>      
